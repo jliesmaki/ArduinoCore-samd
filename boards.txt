@@ -368,3 +368,32 @@ tian_cons.pid.0=0xEA70
 tian_cons.descriptor.0=Standard Com Port
 tian_cons.hide=true
 tian_cons.build.board=SAMD_TIAN
+
+
+# SAMC21 XPlained Pro (Debug Port)
+# ---------------------------------------
+samc21_xplained.name=SAMC21 XPlained Pro (Debug Port)
+samc21_xplained.vid.0=0x03eb
+samc21_xplained.pid.0=0x2157
+
+samc21_xplained.upload.tool=openocd
+samc21_xplained.upload.protocol=sam-ba
+samc21_xplained.upload.maximum_size=262144
+samc21_xplained.upload.use_1200bps_touch=false
+samc21_xplained.upload.wait_for_upload_port=false
+samc21_xplained.upload.native_usb=false
+samc21_xplained.build.mcu=cortex-m0plus
+samc21_xplained.build.f_cpu=48000000L
+samc21_xplained.build.usb_product="Arduino Zero"
+samc21_xplained.build.usb_manufacturer="Arduino LLC"
+samc21_xplained.build.board=SAMC_XPLAINED
+samc21_xplained.build.core=arduino
+samc21_xplained.build.extra_flags=-D__SAMC21J18A__ {build.usb_flags}
+samc21_xplained.build.ldscript=linker_scripts/gcc/samc21j18a_flash.ld
+samc21_xplained.build.openocdscript=openocd_scripts/samc21_xplained_pro.cfg
+samc21_xplained.build.variant=samc21_xplained
+samc21_xplained.build.variant_system_lib=
+samc21_xplained.build.vid=0x03eb
+samc21_xplained.build.pid=0x2111
+#samc21_xplained.bootloader.tool=openocd
+#samc21_xplained.bootloader.file=samc21_xplained/samd21_sam_ba.bin
