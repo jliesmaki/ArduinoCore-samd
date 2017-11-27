@@ -49,11 +49,6 @@ void SystemInit( void )
 #if SAMC_SERIES
 
     
-    
-    
-#define CLOCKCONFIG_32768HZ_CRYSTAL
-    
-    
       /* Set 1 Flash Wait State for 48MHz (2 for the L21 and C21), cf tables 20.9 and 35.27 in SAMD21 Datasheet */
   NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS_DUAL ; // two wait states
 
@@ -179,7 +174,7 @@ void SystemInit( void )
   while ( OSCCTRL->OSC48MSYNCBUSY.reg & OSCCTRL_OSC48MSYNCBUSY_OSC48MDIV );
 
 #else
-  #error "startup.c: Clock source must be selected in the boards.txt file (normally through the Tools menu)."
+  #error "startup.c: Clock source must be selected in the boards.txt file"
 #endif
 
 
@@ -192,35 +187,7 @@ void SystemInit( void )
    */
   NVMCTRL->CTRLB.bit.MANW = 1;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
 
 #else // !SAMC_SERIES
   /* Set 1 Flash Wait State for 48MHz, cf tables 20.9 and 35.27 in SAMD21 Datasheet */
