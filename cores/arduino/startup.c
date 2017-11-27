@@ -1,4 +1,6 @@
 /*
+  Copyright (c) 2017 Scott Price. All right reserved.
+  Copyright (c) 2017 MattairTech LLC. All right reserved.
   Copyright (c) 2015 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -49,7 +51,7 @@ void SystemInit( void )
 #if SAMC_SERIES
 
     
-      /* Set 1 Flash Wait State for 48MHz (2 for the L21 and C21), cf tables 20.9 and 35.27 in SAMD21 Datasheet */
+  /* Set 2 Flash Wait States for the C21, cf table 45-34 in SAMC21 Datasheet */
   NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS_DUAL ; // two wait states
 
   /* Turn on the digital interface clock */
@@ -161,20 +163,11 @@ void SystemInit( void )
   GCLK->GENCTRL[GENERIC_CLOCK_GENERATOR_MAIN].reg = ( GCLK_GENCTRL_DIV(2) | GCLK_GENCTRL_SRC_DPLL96M | GCLK_GENCTRL_IDC | GCLK_GENCTRL_GENEN );
   while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
 
-#elif (defined(CLOCKCONFIG_INTERNAL) || defined(CLOCKCONFIG_INTERNAL_USB))
-  /* ----------------------------------------------------------------------------------------------
-   * Enable DFLL48M clock (D21/L21) or RC oscillator (C21)
-   */
-  #if defined(CLOCKCONFIG_INTERNAL_USB)
-    #error "startup.c: CLOCKCONFIG_INTERNAL_USB setting invalid for C21 chips as they lack USB."
-  #endif
-  
+#else // Internal Clock
   /* Change OSC48M divider to /1. CPU will run at 48MHz */
   OSCCTRL->OSC48MDIV.reg = OSCCTRL_OSC48MDIV_DIV(0);
   while ( OSCCTRL->OSC48MSYNCBUSY.reg & OSCCTRL_OSC48MSYNCBUSY_OSC48MDIV );
 
-#else
-  #error "startup.c: Clock source must be selected in the boards.txt file"
 #endif
 
 

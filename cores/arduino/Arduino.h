@@ -1,5 +1,6 @@
 /*
   Arduino.h - Main include file for the Arduino SDK
+  Copyright (c) 2017 MattairTech LLC. All right reserved.
   Copyright (c) 2014 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
