@@ -26,7 +26,11 @@
 #define _IO_H_
 
 #define RAMSTART (HMCRAMC0_ADDR)
-#define RAMSIZE  (HMCRAMC0_SIZE)
+#ifdef HMCRAMC0_SIZE
+# define RAMSIZE  (HMCRAMC0_SIZE)
+#else
+# define RAMSIZE  (HSRAM_SIZE)
+#endif
 #define RAMEND   (RAMSTART + RAMSIZE - 1)
 
 #endif

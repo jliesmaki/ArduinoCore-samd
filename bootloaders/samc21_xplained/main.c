@@ -106,7 +106,6 @@ uint32_t* pulSketch_Start_Address;
   }
 #endif
 
-/*
 #if defined(BOOT_LOAD_PIN)
   volatile PortGroup *boot_port = (volatile PortGroup *)(&(PORT->Group[BOOT_LOAD_PIN / 32]));
   volatile bool boot_en;
@@ -125,7 +124,6 @@ uint32_t* pulSketch_Start_Address;
     return;
   }
 #endif
-*/
 
 //  LED_on();
 
@@ -139,43 +137,24 @@ uint32_t* pulSketch_Start_Address;
   asm("bx %0"::"r"(*pulSketch_Start_Address));
 }
 
-#if DEBUG_ENABLE
-#	define DEBUG_PIN_HIGH 	port_pin_set_output_level(BOOT_LED, 1)
-#	define DEBUG_PIN_LOW 	port_pin_set_output_level(BOOT_LED, 0)
-#else
-#	define DEBUG_PIN_HIGH 	do{}while(0)
-#	define DEBUG_PIN_LOW 	do{}while(0)
-#endif
-
 /**
  *  \brief SAMD21 SAM-BA Main loop.
  *  \return Unused (ANSI-C compatibility).
  */
 int main(void)
 {
-#if SAM_BA_INTERFACE == SAM_BA_USBCDC_ONLY  ||  SAM_BA_INTERFACE == SAM_BA_BOTH_INTERFACES
-  P_USB_CDC pCdc;
-#endif
-  DEBUG_PIN_HIGH;
-
   /* Jump in application if condition is satisfied */
   check_start_application();
 
+  LED_on();
   /* We have determined we should stay in the monitor. */
   /* System initialization */
   board_init();
   __enable_irq();
 
-#if SAM_BA_INTERFACE == SAM_BA_UART_ONLY  ||  SAM_BA_INTERFACE == SAM_BA_BOTH_INTERFACES
   /* UART is enabled in all cases */
   serial_open();
-#endif
 
-#if SAM_BA_INTERFACE == SAM_BA_USBCDC_ONLY  ||  SAM_BA_INTERFACE == SAM_BA_BOTH_INTERFACES
-  pCdc = usb_init();
-#endif
-
-  DEBUG_PIN_LOW;
 
   /* Initialize LEDs */
   LED_init();
@@ -190,25 +169,6 @@ int main(void)
   /* Wait for a complete enum on usb or a '#' char on serial line */
   while (1)
   {
-#if SAM_BA_INTERFACE == SAM_BA_USBCDC_ONLY  ||  SAM_BA_INTERFACE == SAM_BA_BOTH_INTERFACES
-    if (pCdc->IsConfigured(pCdc) != 0)
-    {
-      main_b_cdc_enable = true;
-    }
-
-    /* Check if a USB enumeration has succeeded and if comm port has been opened */
-    if (main_b_cdc_enable)
-    {
-      sam_ba_monitor_init(SAM_BA_INTERFACE_USBCDC);
-      /* SAM-BA on USB loop */
-      while( 1 )
-      {
-        sam_ba_monitor_run();
-      }
-    }
-#endif
-
-#if SAM_BA_INTERFACE == SAM_BA_UART_ONLY  ||  SAM_BA_INTERFACE == SAM_BA_BOTH_INTERFACES
     /* Check if a '#' has been received */
     if (!main_b_cdc_enable && serial_sharp_received())
     {
@@ -219,7 +179,6 @@ int main(void)
         sam_ba_monitor_run();
       }
     }
-#endif
   }
 }
 
