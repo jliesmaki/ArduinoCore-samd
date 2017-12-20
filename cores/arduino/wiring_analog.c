@@ -187,7 +187,6 @@ uint32_t analogRead(uint32_t pin)
 
   pinPeripheral(pin, PIO_ANALOG);
 
-return 10;
   if (pin == A0) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
     syncDAC();
     DAC->CTRLA.bit.ENABLE = 0x00; // Disable DAC
