@@ -38,13 +38,13 @@ typedef enum _EAnalogChannel
   ADC_Channel5=5,
   ADC_Channel6=6,
   ADC_Channel7=7,
-#if defined(__SAMD21J18A__) || defined(__SAMC21J18A__)
+#if defined(__SAMD21J18A__) || defined(SAMC_SERIES)
   ADC_Channel8=8,
   ADC_Channel9=9,
-#endif // __SAMD21J18A__ || __SAMC21J18A__
+#endif // __SAMD21J18A__ || SAMC_SERIES
   ADC_Channel10=10,
   ADC_Channel11=11,
-#if defined(__SAMD21J18A__) || defined(__SAMC21J18A__)
+#if defined(__SAMD21J18A__)
   ADC_Channel12=12,
   ADC_Channel13=13,
   ADC_Channel14=14,
