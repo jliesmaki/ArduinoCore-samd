@@ -29,19 +29,20 @@
 //   - SPISetting(clock, bitOrder, dataMode)
 #define SPI_HAS_TRANSACTION 1
 
+// SPI_HAS_NOTUSINGINTERRUPT means that SPI has notUsingInterrupt() method
+#define SPI_HAS_NOTUSINGINTERRUPT 1
+
 #define SPI_MODE0 0x02
 #define SPI_MODE1 0x00
 #define SPI_MODE2 0x03
 #define SPI_MODE3 0x01
 
-#if defined(__SAMD21G18A__)
-  // Even if not specified on the datasheet, the SAMD21G18A MCU
-  // doesn't operate correctly with clock dividers lower than 4.
-  // This allows a theoretical maximum SPI clock speed of 12Mhz
-  #define SPI_MIN_CLOCK_DIVIDER 4
-  // Other SAMD21xxxxx MCU may be affected as well
-#else
-  #define SPI_MIN_CLOCK_DIVIDER 2
+#if defined(ARDUINO_ARCH_SAMD)
+  // The datasheet specifies a typical SPI SCK period (tSCK) of 42 ns,
+  // see "Table 36-48. SPI Timing Characteristics and Requirements",
+  // which translates into a maximum SPI clock of 23.8 MHz.
+  // Conservatively, the divider is set for a 12 MHz maximum SPI clock.
+  #define SPI_MIN_CLOCK_DIVIDER (uint8_t)(1 + ((F_CPU - 1) / 12000000))
 #endif
 
 class SPISettings {
@@ -56,6 +57,25 @@ class SPISettings {
 
   // Default speed set to 4MHz, SPI mode set to MODE 0 and Bit order set to MSB first.
   SPISettings() { init_AlwaysInline(4000000, MSBFIRST, SPI_MODE0); }
+
+  bool operator==(const SPISettings& rhs) const
+  {
+    if ((this->clockFreq == rhs.clockFreq) &&
+        (this->bitOrder == rhs.bitOrder) &&
+        (this->dataMode == rhs.dataMode)) {
+      return true;
+    }
+    return false;
+  }
+
+  bool operator!=(const SPISettings& rhs) const
+  {
+    return !(*this == rhs);
+  }
+
+  uint32_t getClockFreq() const {return clockFreq;}
+  uint8_t getDataMode() const {return (uint8_t)dataMode;}
+  BitOrder getBitOrder() const {return (bitOrder == MSB_FIRST ? MSBFIRST : LSBFIRST);}
 
   private:
   void init_MightInline(uint32_t clock, BitOrder bitOrder, uint8_t dataMode) {
@@ -89,10 +109,11 @@ class SPISettings {
   friend class SPIClass;
 };
 
+const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
+
 class SPIClass {
   public:
   SPIClass(SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK, uint8_t uc_pinMOSI, SercomSpiTXPad, SercomRXPad);
-
 
   byte transfer(uint8_t data);
   uint16_t transfer16(uint16_t data);
@@ -100,6 +121,7 @@ class SPIClass {
 
   // Transaction Functions
   void usingInterrupt(int interruptNumber);
+  void notUsingInterrupt(int interruptNumber);
   void beginTransaction(SPISettings settings);
   void endTransaction(void);
 
@@ -125,6 +147,8 @@ class SPIClass {
 
   SercomSpiTXPad _padTx;
   SercomRXPad _padRx;
+
+  SPISettings settings;
 
   bool initialized;
   uint8_t interruptMode;
