@@ -19,6 +19,8 @@
 #ifndef USB_HOST_H_INCLUDED
 #define USB_HOST_H_INCLUDED
 
+#ifdef USBCON
+
 #include <stdint.h>
 #include "samd21_host.h"
 #ifdef __cplusplus
@@ -63,4 +65,5 @@ extern uint32_t UHD_Pipe_Is_Transfer_Complete(uint32_t ul_pipe, uint32_t ul_toke
 }
 #endif
 
+#endif // USBCON
 #endif /* USB_HOST_H_INCLUDED */

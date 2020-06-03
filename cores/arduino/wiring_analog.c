@@ -35,8 +35,7 @@ static void syncADC() {
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
 #else
-  while (ADC->STATUS.bit.SYNCBUSY == 1)
-    ;
+  while (ADC->STATUS.bit.SYNCBUSY == 1);
 #endif
 
 }
@@ -47,8 +46,7 @@ static void syncDAC() {
 #if SAMC_SERIES
   while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
 #else
-  while (DAC->STATUS.bit.SYNCBUSY == 1)
-    ;
+  while (DAC->STATUS.bit.SYNCBUSY == 1);
 #endif
 }
 
@@ -187,7 +185,8 @@ uint32_t analogRead(uint32_t pin)
 
   pinPeripheral(pin, PIO_ANALOG);
 
-  if (pin == A0) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
+  // Disable DAC, if analogWrite() was used previously to enable the DAC
+  if ((g_APinDescription[pin].ulADCChannelNumber == ADC_Channel0) || (g_APinDescription[pin].ulADCChannelNumber == DAC_Channel0)) {
     syncDAC();
     DAC->CTRLA.bit.ENABLE = 0x00; // Disable DAC
     //DAC->CTRLB.bit.EOEN = 0x00; // The DAC output is turned off.
@@ -217,6 +216,9 @@ uint32_t analogRead(uint32_t pin)
   while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   //syncADC();
   ADC->SWTRIG.bit.START = 1;
+
+  // Waiting for the 1st conversion to complete
+  while (ADC->INTFLAG.bit.RESRDY == 0);
 
   // Clear the Data Ready flag
   ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
@@ -253,7 +255,7 @@ void analogWrite(uint32_t pin, uint32_t value)
   {
     // DAC handling code
 
-    if (pin != PIN_A0) { // Only 1 DAC on A0 (PA02)
+    if ((pinDesc.ulADCChannelNumber != ADC_Channel0) && (pinDesc.ulADCChannelNumber != DAC_Channel0)) { // Only 1 DAC on AIN0 / PA02
       return;
     }
 

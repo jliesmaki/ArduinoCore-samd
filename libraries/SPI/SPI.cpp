@@ -26,9 +26,7 @@
 #define SPI_IMODE_EXTINT 1
 #define SPI_IMODE_GLOBAL 2
 
-const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
-
-SPIClass::SPIClass(SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK, uint8_t uc_pinMOSI, SercomSpiTXPad PadTx, SercomRXPad PadRx)
+SPIClass::SPIClass(SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK, uint8_t uc_pinMOSI, SercomSpiTXPad PadTx, SercomRXPad PadRx) : settings(SPISettings(0, MSBFIRST, SPI_MODE0))
 {
   initialized = false;
   assert(p_sercom != NULL);
@@ -68,12 +66,15 @@ void SPIClass::init()
 
 void SPIClass::config(SPISettings settings)
 {
-  _p_sercom->disableSPI();
+  if (this->settings != settings) {
+    this->settings = settings;
+    _p_sercom->disableSPI();
 
-  _p_sercom->initSPI(_padTx, _padRx, SPI_CHAR_SIZE_8_BITS, settings.bitOrder);
-  _p_sercom->initSPIClock(settings.dataMode, settings.clockFreq);
+    _p_sercom->initSPI(_padTx, _padRx, SPI_CHAR_SIZE_8_BITS, settings.bitOrder);
+    _p_sercom->initSPIClock(settings.dataMode, settings.clockFreq);
 
-  _p_sercom->enableSPI();
+    _p_sercom->enableSPI();
+  }
 }
 
 void SPIClass::end()
@@ -105,8 +106,28 @@ void SPIClass::usingInterrupt(int interruptNumber)
   else
   {
     interruptMode |= SPI_IMODE_EXTINT;
-    interruptMask |= (1 << interruptNumber);
+    interruptMask |= (1 << g_APinDescription[interruptNumber].ulExtInt);
   }
+
+  if (irestore)
+    interrupts();
+}
+
+void SPIClass::notUsingInterrupt(int interruptNumber)
+{
+  if ((interruptNumber == NOT_AN_INTERRUPT) || (interruptNumber == EXTERNAL_INT_NMI))
+    return;
+
+  if (interruptMode & SPI_IMODE_GLOBAL)
+    return; // can't go back, as there is no reference count
+
+  uint8_t irestore = interruptsStatus();
+  noInterrupts();
+
+  interruptMask &= ~(1 << g_APinDescription[interruptNumber].ulExtInt);
+
+  if (interruptMask == 0)
+    interruptMode = SPI_IMODE_NONE;
 
   if (irestore)
     interrupts();

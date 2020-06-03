@@ -19,6 +19,8 @@
 #ifndef SAMD21_HOST_H_INCLUDED
 #define SAMD21_HOST_H_INCLUDED
 
+#ifdef USBCON
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -126,4 +128,5 @@ extern __attribute__((__aligned__(4))) volatile UsbHostDescriptor usb_pipe_table
 }
 #endif
 
+#endif /* USBCON */
 #endif /* SAMD21_HOST_H_INCLUDED */
