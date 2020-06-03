@@ -35,8 +35,7 @@ static void syncADC() {
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
 #else
-  while (ADC->STATUS.bit.SYNCBUSY == 1)
-    ;
+  while (ADC->STATUS.bit.SYNCBUSY == 1);
 #endif
 
 }
@@ -47,8 +46,7 @@ static void syncDAC() {
 #if SAMC_SERIES
   while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
 #else
-  while (DAC->STATUS.bit.SYNCBUSY == 1)
-    ;
+  while (DAC->STATUS.bit.SYNCBUSY == 1);
 #endif
 }
 
