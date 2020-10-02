@@ -91,7 +91,7 @@ void tone (uint32_t outputPin, uint32_t frequency, uint32_t duration)
 
 #ifndef TC5
     // Enable GCLK for TC0 and TC1 (timer counter input clock)
-    GCLK->PCHCTRL[GCM_TC1_TC0].reg = ( GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
+    GCLK->PCHCTRL[GCM_TC0_TC1].reg = ( GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
     while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
 #else
     // Enable GCLK for TC4 and TC5 (timer counter input clock)
