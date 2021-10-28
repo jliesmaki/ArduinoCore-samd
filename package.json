@@ -1,5 +1,5 @@
 {
-  "name": "framework-arduinodamd",
+  "name": "framework-arduinosamd",
   "description": "Arduino Wiring-based Framework (Atmel SAMD Core)",
   "version": "1.6.16-jeffl1",
   "url": "https://github.com/jliesmaki/ArduinoCore-samd"
