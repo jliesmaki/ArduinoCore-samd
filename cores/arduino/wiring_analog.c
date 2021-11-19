@@ -29,8 +29,8 @@ static int _ADCResolution = 10;
 static int _writeResolution = 8;
 
 // Wait for synchronization of registers between the clock domains
-static __inline__ void syncADC() __attribute__((always_inline, unused));
-static void syncADC() {
+static __inline__ void syncADC(void) __attribute__((always_inline, unused));
+static void syncADC(void) {
 #if SAMC_SERIES
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
@@ -42,11 +42,11 @@ static void syncADC() {
 static __inline__ void syncOneADC(Adc* adc) __attribute__((always_inline, unused));
 static void syncOneADC(Adc* adc) {
 #if SAMC_SERIES
-    while ( adc->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  while ( adc->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
 #else
-    while (adc->STATUS.bit.SYNCBUSY == 1);
+  while (adc->STATUS.bit.SYNCBUSY == 1);
 #endif
-    
+
 }
 
 // Wait for synchronization of registers between the clock domains
@@ -202,7 +202,7 @@ uint32_t analogRead(uint32_t pin)
     syncDAC();
   }
 
- // while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  //while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   syncOneADC(ADC);
   ADC->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin].ulADCChannelNumber; // Selection for the positive ADC input
   // Control A
@@ -222,7 +222,7 @@ uint32_t analogRead(uint32_t pin)
   ADC->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
 
   // Start conversion
-  // while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  //while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   syncOneADC(ADC);
   ADC->SWTRIG.bit.START = 1;
 
@@ -233,7 +233,7 @@ uint32_t analogRead(uint32_t pin)
   ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
 
   // Start conversion again, since The first conversion after the reference is changed must not be used.
-  // while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  //while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   syncOneADC(ADC);
   ADC->SWTRIG.bit.START = 1;
 
@@ -241,10 +241,10 @@ uint32_t analogRead(uint32_t pin)
   while (ADC->INTFLAG.bit.RESRDY == 0);   // Waiting for conversion to complete
   valueRead = ADC->RESULT.reg;
 
-  // while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  //while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   syncOneADC(ADC);
   ADC->CTRLA.bit.ENABLE = 0x00;             // Disable ADC
-  // while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  //while ( ADC->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   syncOneADC(ADC);
 
   return mapResolution(valueRead, _ADCResolution, _readResolution);

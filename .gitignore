@@ -1,4 +1,5 @@
 *.bz2
+*.swp
 
 bootloaders/*/build/
 *.kdev4
